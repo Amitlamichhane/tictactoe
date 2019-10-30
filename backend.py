@@ -1,9 +1,12 @@
 import sys 
 import json 
+import pandas as pd 
 from flask import Flask, abort, request,send_file,jsonify 
 from flask_restplus import Resource, Api, reqparse, fields 
 from flask_cors import CORS
-
+#import model and clean part 
+import model.clean_data as clean 
+import model.train as train
 "API"
 app = Flask(__name__)
 cors = CORS(app,resources ={r"*":{"origins":"*"}})
@@ -26,13 +29,14 @@ class getPrediction(Resource):
     responses={200:'Success', 400:'Incorrect input '})
     def post(self):
         jsonreq = request.get_json()
-        for i in jsonreq:
-            print(i)
+    
+        df_data = pd.DataFrame.from_dict({field:[jsonreq[field]] for field in jsonreq})
+        
+        
+        a = clean.change_data(df_data)
+        train.predict_using_model(a,1)
         return {
             "Post":jsonreq["top_left_square"]
         }
-
-    def get(self):
-        return {"hello":"world"}
 if __name__ == '__main__':
     app.run(debug=True)
