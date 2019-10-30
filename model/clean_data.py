@@ -9,11 +9,11 @@ changing x to 1
          positive to 1 
 """
 def map_conditon(x):
-    if x =='x':
+    if x =='x' or x == 'X':
         return 1 
-    elif x =='o':
+    elif x =='o' or x =='O':
         return 2 
-    elif x =='b':
+    elif x =='b' or  x == null:
         return 0
     elif x=="negative":
         return 0

@@ -104,7 +104,7 @@ class Game extends React.Component {
       if (winner === -1) {
         status = "Match Drawn ";
       } else if (winner){
-        status = "Winner: " + winner;
+        status = "Winner: " + winner.player;
         
       }else {
         status = "Next player: " + (this.state.xIsNext ? "X" : "O");
@@ -114,6 +114,7 @@ class Game extends React.Component {
         <div className="game">
           <div className="game-board">
             <Board
+              winningSquares = {winner? winner.line: []}
               squares={current.squares}
               onClick={i => this.handleClick(i)}
             />
@@ -144,7 +145,7 @@ class Game extends React.Component {
     for (let i = 0; i < lines.length; i++) {
       const [a, b, c] = lines[i];
       if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-        return squares[a];
+        return {player:squares[a], line : [a,b,c]};
       }
     }
     for (let i = 0; i< squares.length; i++) {
