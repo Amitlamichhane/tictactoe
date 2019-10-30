@@ -1,5 +1,6 @@
 
 import imp
+import os 
 import pandas as pd 
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
@@ -73,6 +74,7 @@ def svm(feature, target):
 
 
 def predict_using_model(x,y,filename= "./knn_model.joblib"):
+
     model = load(filename)
     y_pred = model.predict(x)
     print(y_pred)
@@ -86,32 +88,21 @@ def predict_using_model(x,y,filename= "./knn_model.joblib"):
         "yes_incorrect" : int(matrix[1][0])
         })
 
-def probability_predict(x,filename = './decision_tree.joblib'):
-    #model = load('./decision_tree.joblib')
-    # probab = model.predict_proba(x)
-    # return ({
-    #     "X winning chance ": probab[0],
-    #     "O winning chance ": probab[1],
-    # })
-    print(filename)
-    pass
-if __name__ == "__main__":
-    data = pd.read_csv("./../data/model.csv")
-    X, y = np.split(data, [-1], axis=1)
-    seed= 2000
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3,random_state = seed)
-    
-    ##knn_models
-    knn_model(X_train,y_train)
-    predict_using_model(X_test,y_test, filename="./knn_model.joblib")
-    #naive_bayes
-    # naive_bayes(X_train,y_train)
-    # predict_using_model(X_test,y_test, filename= "./naive_bayes_model.joblib")
-    #decision_tree very unstable
-    # decision_tree(X_train,y_train)
-    # predict_using_model(X_test,y_test,filename="./decision_tree.joblib")
-
-
+def probability_predict(x,filename = 'knn_model.joblib'):
+    fi = os.getcwd()+'/model/'+filename
+    model = load(fi)
+    probab = model.predict_proba(x)
+    return ({
+        "X winning chance ": probab[0][0],
+        "O winning chance ": probab[0][1],
+    })
+# if __name__ == "__main__":
+#     data = pd.read_csv("./../data/model.csv")
+#     X, y = np.split(data, [-1], axis=1)
+#     seed= 2000
+#     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3,random_state = seed)    
+#     ##knn_models
+#     predict_using_model(X_test,y_test)
 
 
 

@@ -34,9 +34,7 @@ class getPrediction(Resource):
         
         
         a = clean.change_data(df_data)
-        train.predict_using_model(a,1)
-        return {
-            "Post":jsonreq["top_left_square"]
-        }
+        train.probability_predict(a)
+        return  train.probability_predict(a)
 if __name__ == '__main__':
     app.run(debug=True)
