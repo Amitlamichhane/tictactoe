@@ -30,7 +30,6 @@ class Game extends React.Component {
   
     handleClick(i) {
       //need to add information about what rows or column it clicked 
-        
         let index = (function (i){
             let rows = Math.floor(i/3) ;
             let columns = i%3;
@@ -43,7 +42,7 @@ class Game extends React.Component {
         const steps = current.steps.slice();
         const stepBy = current.stepBy.slice();
         //fetch prediction here 
-        const prediction = fetch(this.state.localUrl, {
+        fetch(this.state.localUrl, {
             method: 'POST',
             headers: {
               'Accept': 'application/json',
@@ -61,10 +60,15 @@ class Game extends React.Component {
               "bottom_middle_square": "x",
               "bottom_right_square": "o"
             })
+          }).then((res)=>{
+              return res.json();
+              
+          }).then((jsonRes)=>{
+              console.log(jsonRes)
+          }).catch((err)=>{
+              throw err;
           })
           //promise left 
-          
-          console.log(prediction) ;
         const winners  = calculateWinner(squares);
 
         if (winners|| squares[i]) {

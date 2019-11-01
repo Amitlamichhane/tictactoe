@@ -3,7 +3,7 @@ import '../index.css'
 
 function Square(props) {
   //console.log(props.value)
-  console.log(props);
+
   return (
     <button 
     className= {(props.gameWon)? "winning-btn" : "square" }
