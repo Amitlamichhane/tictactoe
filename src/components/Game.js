@@ -14,14 +14,17 @@ class Game extends React.Component {
           {
             squares: Array(9).fill(null),
             steps: Array(0).fill(null),
-            stepBy: Array(0).fill(null)
+            stepBy: Array(0).fill(null),
+            xPrediction: Array(0).fill(null),
+            oPrediction: Array(0).fill(null)
           }
         ],
+        localUrl: "http://localhost:5000/getPrediction",
         stepNumber: 0,
-        xIsNext: true
+        xIsNext: true,
         //what else need to be added to do the following stuff 
         // location for square in row and column 
-
+        
       };
     }
   
@@ -39,7 +42,31 @@ class Game extends React.Component {
         const squares = current.squares.slice();
         const steps = current.steps.slice();
         const stepBy = current.stepBy.slice();
+        //fetch prediction here 
+        const prediction = fetch(this.state.localUrl, {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: 
+            JSON.stringify({
+              "top_left_square": "x",
+              "top_middle_square": "o",
+              "top_right_square": "x",
+              "middle_left_square": "o",
+              "middle_middle_square": "o",
+              "middle_right_square": "x",
+              "bottom_left_square": "o",
+              "bottom_middle_square": "x",
+              "bottom_right_square": "o"
+            })
+          })
+          //promise left 
+          
+          console.log(prediction) ;
         const winners  = calculateWinner(squares);
+
         if (winners|| squares[i]) {
             return;
         }

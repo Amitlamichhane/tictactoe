@@ -13,7 +13,7 @@ def map_conditon(x):
         return 1 
     elif x =='o' or x =='O':
         return 2 
-    elif x =='b' or  x == null:
+    elif x =='b' :
         return 0
     elif x=="negative":
         return 0

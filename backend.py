@@ -29,10 +29,8 @@ class getPrediction(Resource):
     responses={200:'Success', 400:'Incorrect input '})
     def post(self):
         jsonreq = request.get_json()
-    
+        #print(jsonreq)
         df_data = pd.DataFrame.from_dict({field:[jsonreq[field]] for field in jsonreq})
-        
-        
         a = clean.change_data(df_data)
         train.probability_predict(a)
         return  train.probability_predict(a)
