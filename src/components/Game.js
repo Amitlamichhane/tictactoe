@@ -42,33 +42,7 @@ class Game extends React.Component {
         const steps = current.steps.slice();
         const stepBy = current.stepBy.slice();
         //fetch prediction here 
-        fetch(this.state.localUrl, {
-            method: 'POST',
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-            },
-            body: 
-            JSON.stringify({
-              "top_left_square": "x",
-              "top_middle_square": "o",
-              "top_right_square": "x",
-              "middle_left_square": "o",
-              "middle_middle_square": "o",
-              "middle_right_square": "x",
-              "bottom_left_square": "o",
-              "bottom_middle_square": "x",
-              "bottom_right_square": "o"
-            })
-          }).then((res)=>{
-              return res.json();
-              
-          }).then((jsonRes)=>{
-              console.log(jsonRes)
-          }).catch((err)=>{
-              throw err;
-          })
-          //promise left 
+        
         const winners  = calculateWinner(squares);
 
         if (winners|| squares[i]) {
@@ -78,6 +52,41 @@ class Game extends React.Component {
         squares[i] = this.state.xIsNext ? "X" : "O";
         stepBy[history.length-1] = squares[i];
         steps[history.length-1] = index;
+        //we can only get prediction here?
+        const xPrediction = current.xPrediction.slice();
+        const oPrediction = current.oPrediction.slice();
+        fetch(this.state.localUrl, {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: 
+            JSON.stringify({
+              "top_left_square": `${squares[0]}`,
+              "top_middle_square": `${squares[1]}`,
+              "top_right_square": `${squares[2]}`,
+              "middle_left_square": `${squares[3]}`,
+              "middle_middle_square": `${squares[4]}`,
+              "middle_right_square": `${squares[5]}`,
+              "bottom_left_square": `${squares[6]}`,
+              "bottom_middle_square": `${squares[7]}`,
+              "bottom_right_square": `${squares[8]}`
+            })
+          }).then((res)=>{
+
+              return res.json();
+              
+          }).then((jsonRes)=>{
+
+              xPrediction[history.length-1] = jsonRes["x"];
+              oPrediction[history.length-1] = jsonRes["o"];
+          }).catch((err)=>{
+              throw err;
+          })
+          //promise left 
+
+
 
         this.setState({
             history: history.concat([
@@ -85,6 +94,8 @@ class Game extends React.Component {
                 squares: squares,
                 steps: steps,
                 stepBy: stepBy,
+                xPrediction:xPrediction,
+                oPrediction:oPrediction,
             }   
             ]),
             stepNumber: history.length,
@@ -109,21 +120,19 @@ class Game extends React.Component {
         const desc = move ?
           'Go to move #' + move:
           'Go to game start';
-        
         const step_highlights = move ?
           'Move By ' +step.stepBy[move-1] + "   to   "+ step.steps[move-1]  :
           '';
         
+        
         return (
           <li key={move}>
-            
             {(() => {
               switch (this.state.stepNumber) {
                 case move:
-                    return  <p><button onClick={() => this.jumpTo(move) }><b>{desc}</b></button>     <b>{step_highlights}</b></p>
-                    ;
+                    return  <p><button onClick={() => this.jumpTo(move) }><b>{desc}</b></button>     <b>{step_highlights}</b>  </p>;
                 default:
-                    return  <p><button onClick={() => this.jumpTo(move)}>{desc}</button>  {step_highlights} </p>  ;
+                    return  <p><button onClick={() => this.jumpTo(move)}>{desc}</button>  {step_highlights}</p> ; 
              }
              })()}
              
@@ -132,15 +141,22 @@ class Game extends React.Component {
       });
   
       let status;
-      if (winner === -1) {
-        status = "Match Drawn ";
-      } else if (winner){
+      if (winner){
         status = "Winner: " + winner.player;
         
-      }else {
+      }
+      else if (! current.squares.includes(null)) {
+        status = "Match Drawn ";
+      } else {
         status = "Next player: " + (this.state.xIsNext ? "X" : "O");
       }
-  
+
+      let x_recent = current.xPrediction.slice(-1)
+      const x_predict = x_recent? `X winning chance ${x_recent}`: "";
+
+      let o_recent = current.oPrediction.slice(-1)
+      const o_predict = o_recent? `O winning chance ${o_recent}`: "";      
+
       return (
         <div className="game">
           <div className="game-board">
@@ -154,6 +170,14 @@ class Game extends React.Component {
             <div>{status}</div>
             <ol>{moves}</ol>
           </div>
+           { 
+                (!winner )?
+                <div className="Prediction">
+                    <div>{x_predict}</div>
+                    <div>{o_predict}</div>
+                </div>
+                :""
+          }
         </div>
       );
     }
@@ -179,12 +203,7 @@ class Game extends React.Component {
         return {player:squares[a], line : [a,b,c]};
       }
     }
-    for (let i = 0; i< squares.length; i++) {
-       if (!squares[i]){
-           return null;
-       }
-    }
-    return -1;
+    return null;
   }
   
 
