@@ -31,8 +31,7 @@ class getPrediction(Resource):
         jsonreq = request.get_json()
         #print(jsonreq)
         df_data = pd.DataFrame.from_dict({field:[jsonreq[field]] for field in jsonreq})
-        a = clean.change_data(df_data)
-        train.probability_predict(a)
-        return  train.probability_predict(a)
+        
+        return  train.probability_predict(df_data)
 if __name__ == '__main__':
     app.run(debug=True)

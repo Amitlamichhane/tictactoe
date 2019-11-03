@@ -3,7 +3,6 @@ import React from 'react';
 
 import Board from './Board'
 import '../index.css'
-import { placeholder } from '@babel/types';
 
 
 class Game extends React.Component {

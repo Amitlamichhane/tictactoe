@@ -14,8 +14,7 @@ from sklearn.metrics import confusion_matrix
 from sklearn.externals import joblib
 from sklearn.externals.joblib import dump,load
 from sklearn import tree
- 
-
+from . import clean_data as cd 
 def save_models(model_name, file):
    dump(model_name,"./{}".format(file))
 """
@@ -96,9 +95,33 @@ def predict_using_model(x,y,filename= "./random_forest.joblib"):
 
 def probability_predict(x,filename = 'random_forest.joblib'):
     fi = os.getcwd()+'/model/'+filename
-    model = load(fi)
-    probab = model.predict_proba(x)
+    #change null to b 
+    x.replace("null","b",inplace=True)
+    #change missing columns with 0 
+    cls_group = ['top_left_square_b', 'top_left_square_o', 'top_left_square_x',
+       'top_middle_square_b', 'top_middle_square_o', 'top_middle_square_x',
+       'top_right_square_b', 'top_right_square_o', 'top_right_square_x',
+       'middle_left_square_b', 'middle_left_square_o', 'middle_left_square_x',
+       'middle_middle_square_b', 'middle_middle_square_o',
+       'middle_middle_square_x', 'middle_right_square_b',
+       'middle_right_square_o', 'middle_right_square_x',
+       'bottom_left_square_b', 'bottom_left_square_o', 'bottom_left_square_x',
+       'bottom_middle_square_b', 'bottom_middle_square_o',
+       'bottom_middle_square_x', 'bottom_right_square_b',
+       'bottom_right_square_o', 'bottom_right_square_x']
     
+    data =  cd.change_data(x,False)
+    new_data = pd.DataFrame()
+    for i in cls_group:
+        if i not in data.columns:
+            new_data[i]=0
+        else:
+            new_data[i] = data[i]
+    print(new_data.columns)
+    model = load(fi)
+    new_data = np.nan_to_num(new_data)
+    probab = model.predict_proba(new_data)
+
     return ({
         "x": probab[0][0],
         "o": probab[0][1],
@@ -109,7 +132,7 @@ if __name__ == "__main__":
     seed= 42
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3,random_state = seed)
     #train for decision tree 
-    random_forest(X_train,y_train)
+    #random_forest(X_train,y_train)
     ##decision tree
     predict_using_model(X_test,y_test)
 
