@@ -5,8 +5,15 @@ from flask import Flask, abort, request,send_file,jsonify
 from flask_restplus import Resource, Api, reqparse, fields 
 from flask_cors import CORS
 #import model and clean part 
+
+
 import model.clean_data as clean 
 import model.train as train
+
+
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
 "API"
 app = Flask(__name__)
 cors = CORS(app,resources ={r"*":{"origins":"*"}})
@@ -28,10 +35,10 @@ class getPrediction(Resource):
     }),\
     responses={200:'Success', 400:'Incorrect input '})
     def post(self):
-        jsonreq = request.get_json()
-        #print(jsonreq)
-        df_data = pd.DataFrame.from_dict({field:[jsonreq[field]] for field in jsonreq})
         
+        jsonreq = request.get_json()
+        df_data = pd.DataFrame.from_dict({field:[jsonreq[field]] for field in jsonreq})
         return  train.probability_predict(df_data)
+
 if __name__ == '__main__':
     app.run(debug=True)

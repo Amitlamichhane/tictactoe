@@ -1,20 +1,24 @@
-
-import imp
 import os 
 import pandas as pd 
 import numpy as np
+
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.naive_bayes import GaussianNB
+
+
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import confusion_matrix
-from sklearn.externals import joblib
-from sklearn.externals.joblib import dump,load
-from sklearn import tree
-from . import clean_data as cd 
+
+from joblib import dump,load
+
+
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
+from model.clean_data import change_data as cd
+#from clean_data import change_data as cd
+
 def save_models(model_name, file):
    dump(model_name,"./{}".format(file))
 """
@@ -25,10 +29,7 @@ and some few probablistic classification
 """
 """
 def knn_model(feature, target):
-
     #training with train test score 
-
-    
     knn = KNeighborsClassifier()
     ##grid search cross -fold
     knn_params = {"n_neighbors":np.arange(1,25)}
@@ -36,54 +37,13 @@ def knn_model(feature, target):
     knn_gscv.fit(feature,target.values.ravel())
     print(knn_gscv.best_params_)
     print(knn_gscv.best_score_)
-
     save_models(knn_gscv,"knn_model.joblib")
 
 
-def decision_tree(feature, target):
-    clf = DecisionTreeClassifier(random_state = 42 )
-    #clf = clf.fit(feature,target)
-    parameter_grid = {'max_depth': [1, 2, 3, 4, 5, 6,7,8 ,9 ,10],
-                  'max_features': [1, 2, 3, 4]}
 
-    clf = GridSearchCV(clf,parameter_grid,cv=10)
-    clf =clf.fit(feature,target.values.ravel())
-    print(clf.best_params_)
-    print(clf.best_score_)
-
-    save_models(clf,"decision_tree.joblib")
-    
-
-def random_forest(feature, target):
-    clf = RandomForestClassifier(random_state = 42 )
-    #clf = clf.fit(feature,target)
-    parameter_grid = {'max_depth': [1, 2, 3, 4, 5, 6,7,8 ,9 ,10],
-                  'max_features': [1, 2, 3, 4]}
-
-    clf = GridSearchCV(clf,parameter_grid,cv=10)
-    clf =clf.fit(feature,target.values.ravel())
-    print(clf.best_params_)
-    print(clf.best_score_)
-
-    save_models(clf,"random_forest.joblib")
-
-
-def naive_bayes(feature, target):
-    
-    naive_model = GaussianNB()
-    naive_model.fit(feature,target)
-    ##grid search cross -fold
-    save_models(naive_model,"naive_bayes_model.joblib")
-
-def svm(feature, target):
-    pass
-
-
-def predict_using_model(x,y,filename= "./random_forest.joblib"):
-
+def predict_using_model(x,y,filename= "./knn_model.joblib"):
     model = load(filename)
     y_pred = model.predict(x)
-    
     matrix = confusion_matrix(y , y_pred)
     print({
         "accuracy": float((matrix[0][0]+matrix[1][1])/(sum(matrix[0])+sum(matrix[1]))),
@@ -93,10 +53,12 @@ def predict_using_model(x,y,filename= "./random_forest.joblib"):
         "yes_incorrect" : int(matrix[1][0])
         })
 
-def probability_predict(x,filename = 'random_forest.joblib'):
+def probability_predict(x,filename = 'knn_model.joblib'):
     fi = os.getcwd()+'/model/'+filename
     #change null to b 
     x.replace("null","b",inplace=True)
+    
+    x = x.applymap(lambda s:s.lower() if type(s) == str else s)
     #change missing columns with 0 
     cls_group = ['top_left_square_b', 'top_left_square_o', 'top_left_square_x',
        'top_middle_square_b', 'top_middle_square_o', 'top_middle_square_x',
@@ -109,19 +71,17 @@ def probability_predict(x,filename = 'random_forest.joblib'):
        'bottom_middle_square_b', 'bottom_middle_square_o',
        'bottom_middle_square_x', 'bottom_right_square_b',
        'bottom_right_square_o', 'bottom_right_square_x']
-    
-    data =  cd.change_data(x,False)
+    data =  cd(x,False)
     new_data = pd.DataFrame()
     for i in cls_group:
         if i not in data.columns:
             new_data[i]=0
         else:
             new_data[i] = data[i]
-    print(new_data.columns)
+    
     model = load(fi)
     new_data = np.nan_to_num(new_data)
     probab = model.predict_proba(new_data)
-
     return ({
         "x": probab[0][0],
         "o": probab[0][1],
@@ -129,12 +89,11 @@ def probability_predict(x,filename = 'random_forest.joblib'):
 if __name__ == "__main__":
     data = pd.read_csv("./../data/model.csv")
     X, y = np.split(data, [-1], axis=1)
-    seed= 42
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3,random_state = seed)
-    #train for decision tree 
-    #random_forest(X_train,y_train)
-    ##decision tree
-    predict_using_model(X_test,y_test)
+    seed= 21
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3,random_state = seed)   
+    #random forest 
+    knn_model(X_train,y_train)
+    predict_using_model(X_test,y_test,"./knn_model.joblib")
 
 
 

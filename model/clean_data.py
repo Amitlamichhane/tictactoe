@@ -25,12 +25,5 @@ def change_data(data, Flag_y = True ):
         X = data[categorical]
         data.drop(categorical,inplace=True,axis=1)
         X_new = pd.get_dummies(X)
+
         return X_new
-
-
-
-if __name__ =="__main__":
-    data = pd.read_csv('./../data/tic_tac_toe_dataset.csv')
-    data = change_data(data)
-    print(data.head())
-    data.to_csv('./../data/model.csv', index= False)
