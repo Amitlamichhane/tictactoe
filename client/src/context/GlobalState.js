@@ -9,7 +9,7 @@ const initialState = {
     squares: Array(9).fill(null),
     xPredict: 0,
     yPredict: 0,
-    status:"",
+    status:"",  
 }
 
 export const GlobalContext = createContext(initialState);
