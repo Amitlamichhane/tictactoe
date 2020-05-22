@@ -6,9 +6,6 @@ function Square(props) {
   //square is essentially a button highlights the button that is currently clicked 
   //that should be board problem and not square problem i think 
   const {winner} = useContext(GlobalContext)
-  
-  
-
   return (
     <button 
     className="box" 

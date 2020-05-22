@@ -2,7 +2,8 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.model_selection import train_test_split
 import numpy as np
-import imp
+import importlib
+from termcolor import colored
 
 def change_data(data, Flag_y = True ):
     
@@ -25,5 +26,5 @@ def change_data(data, Flag_y = True ):
         X = data[categorical]
         data.drop(categorical,inplace=True,axis=1)
         X_new = pd.get_dummies(X)
-
+        
         return X_new

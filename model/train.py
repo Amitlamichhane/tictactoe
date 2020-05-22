@@ -3,15 +3,13 @@ import pandas as pd
 import numpy as np
 
 from sklearn.neighbors import KNeighborsClassifier
-
-
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import confusion_matrix
-
 from joblib import dump,load
 
+from termcolor import colored
 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -35,8 +33,6 @@ def knn_model(feature, target):
     knn_params = {"n_neighbors":np.arange(1,25)}
     knn_gscv = GridSearchCV(knn, knn_params,cv=10)
     knn_gscv.fit(feature,target.values.ravel())
-    print(knn_gscv.best_params_)
-    print(knn_gscv.best_score_)
     save_models(knn_gscv,"knn_model.joblib")
 
 
@@ -57,6 +53,8 @@ def probability_predict(x,filename = 'knn_model.joblib'):
     fi = os.getcwd()+'/model/'+filename
     #change null to b 
     x.replace("null","b",inplace=True)
+    x.replace("","b",inplace=True)
+    
     
     x = x.applymap(lambda s:s.lower() if type(s) == str else s)
     #change missing columns with 0 
@@ -72,6 +70,7 @@ def probability_predict(x,filename = 'knn_model.joblib'):
        'bottom_middle_square_x', 'bottom_right_square_b',
        'bottom_right_square_o', 'bottom_right_square_x']
     data =  cd(x,False)
+
     new_data = pd.DataFrame()
     for i in cls_group:
         if i not in data.columns:
@@ -80,12 +79,17 @@ def probability_predict(x,filename = 'knn_model.joblib'):
             new_data[i] = data[i]
     
     model = load(fi)
+    
     new_data = np.nan_to_num(new_data)
+    
     probab = model.predict_proba(new_data)
+    
     return ({
         "x": probab[0][0],
         "o": probab[0][1],
     })
+
+
 if __name__ == "__main__":
     data = pd.read_csv("./../data/model.csv")
     X, y = np.split(data, [-1], axis=1)

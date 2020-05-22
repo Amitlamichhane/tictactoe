@@ -10,7 +10,7 @@ from flask_cors import CORS
 import model.clean_data as clean 
 import model.train as train
 
-
+from termcolor import colored
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
@@ -37,8 +37,12 @@ class getPrediction(Resource):
     def post(self):
         
         jsonreq = request.get_json()
+
         df_data = pd.DataFrame.from_dict({field:[jsonreq[field]] for field in jsonreq})
-        return  train.probability_predict(df_data)
+        print(colored(df_data,"yellow"))
+        random = train.probability_predict(df_data) 
+        print(random)
+        return  random
 
 if __name__ == '__main__':
     app.run(debug=True)

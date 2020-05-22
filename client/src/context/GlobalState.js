@@ -58,6 +58,7 @@ export const GlobalProvider = ({children}) =>{
     }
 
     async function getPrediction(){
+        console.log(state.squares)
 
         fetch("http://localhost:5000/getPrediction", {
             method: 'POST',
