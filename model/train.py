@@ -3,13 +3,12 @@ import pandas as pd
 import numpy as np
 
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import confusion_matrix
 from joblib import dump,load
 
-from termcolor import colored
+
 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)

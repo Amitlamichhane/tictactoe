@@ -1,5 +1,0 @@
-name: tictactoe
-channels:
-  - defaults
-prefix: //anaconda3/envs/tictactoe
-
